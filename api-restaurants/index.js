@@ -44,6 +44,10 @@ app.post('/restaurantes', (req, res) => {
       return res.status(400).json({ message: 'Email já cadastrado. Use outro email.' });
     }
 
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'A senha deve ter no mínimo 8 caracteres.' });
+  }
+
     const newRestaurant = {
       id: new Date().getTime(),
       name,
