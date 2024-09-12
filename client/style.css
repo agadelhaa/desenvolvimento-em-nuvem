@@ -44,6 +44,13 @@ body {
   color: var(--text-color);
 }
 
+#description {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+}
+
 #description h2,
 #description .title {
   color: var(--primary);

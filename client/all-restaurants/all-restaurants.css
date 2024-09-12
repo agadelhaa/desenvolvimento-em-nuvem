@@ -1,0 +1,17 @@
+#all-restaurants-header {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+      url("../images/tables.jpg");
+    background-position: center;
+    background-size: cover;
+    height: 60vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    color: var(--text-color);
+    margin-bottom: 3em;
+  }
+
+  #all-restaurants-header h1 {
+    font-size: 3em;
+    font-weight: bold;
+  }
