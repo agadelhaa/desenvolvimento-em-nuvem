@@ -1,0 +1,44 @@
+#restaurant-header {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("../images/reserved.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 60vh;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: var(--text-color);
+}
+
+#restaurant-header span {
+  color:var(--primary);
+  font-size: 3em;
+  max-width: 600px;
+  font-weight: bold;
+  margin-bottom: 0.5em
+}
+
+#btns-container {
+  display: flex;
+  gap: 2em;
+  justify-content: space-between;
+  margin: 3em;
+}
+
+#restaurant-info, #restaurant-reservations {
+  color: var(--text-color);
+  justify-content: center;
+}
+
+.restaurant-info-content h2, .restaurant-reservations-content h2 {
+  text-align: center;
+  margin-bottom: 0.5em;
+  color: var(--primary);
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.restaurant-time {
+  display: flex;
+  gap: 3em;
+}
