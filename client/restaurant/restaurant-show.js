@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = `/client/restaurant/restaurant-show.html?id=${restaurantId}`;
         })
         .catch(error => {
+            alert(error.message)
             console.error('Erro ao atualizar o restaurante:', error);
         });
     };
@@ -93,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = '/client/index.html';
             })
             .catch(error => {
+                alert(error.message)
                 console.error('Erro ao deletar o restaurante:', error);
             });
         }

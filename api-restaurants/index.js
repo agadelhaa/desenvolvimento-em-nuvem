@@ -39,6 +39,11 @@ app.post('/restaurantes', (req, res) => {
       return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
     }
 
+    const emailExists = restaurants.some(restaurant => restaurant.email === email);
+    if (emailExists) {
+      return res.status(400).json({ message: 'Email já cadastrado. Use outro email.' });
+    }
+
     const newRestaurant = {
       id: new Date().getTime(),
       name,

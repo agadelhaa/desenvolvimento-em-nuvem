@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       window.location.href = `/client/restaurant/restaurant-show.html?id=${data.restaurant.id}`;
     } catch (error) {
+      alert(error.message);
       console.error('Erro ao criar o restaurante:', error);
     }
   }
