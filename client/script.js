@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const data = await response.json();
 
-      window.location.href = `/client/restaurant/restaurant-show.html?id=${data.restaurant.id}`;
+      window.location.href = `/client/restaurant/restaurant-show.html?id=${data.restaurantId}`;
     } catch (error) {
       alert(error.message);
       console.error('Erro ao criar o restaurante:', error);

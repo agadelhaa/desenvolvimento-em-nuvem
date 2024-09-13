@@ -1,37 +1,45 @@
 const express = require('express');
 const cors = require('cors');
+const db = require('./config/db.js');
+
 const app = express();
 const port = 5080;
 
 app.use(cors());
 app.use(express.json());
 
-let restaurants = [
-  {id: 1, name: 'Restaurante A', address: 'Antonio Sales 1077', startTime: '11:00', endTime: '23:00', email:'a@email.com', password:'111111'},
-  {id: 2, name: 'Restaurante B', address: 'Rua da Paz 942', startTime: '17:00', endTime: '23:00', email:'b@email.com', password:'111111'},
-  {id: 3, name: 'Restaurante C', address: 'Avenida Beira Mar 79', startTime: '07:00', endTime: '18:00', email:'c@email.com', password:'111111'}, // Fixed typo
-  {id: 4, name: 'Restaurante D', address: 'Avenida Monsenhor Tabosa 211', startTime: '18:00', endTime: '23:00', email:'d@email.com', password:'111111'}
-];
-
-app.get('/restaurantes', (req, res) => {
+app.get('/restaurantes', async (req, res) => {
   try {
-    res.json(restaurants);
+    db.all('SELECT * FROM restaurants', [], (err, rows) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+      res.json(rows);
+    });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao obter restaurantes', error: error.message });
   }
 });
 
-app.get('/restaurantes/:id', (req, res) => {
+app.get('/restaurantes/:id', async (req, res) => {
   try {
-    const restaurant = restaurants.find(r => r.id === parseInt(req.params.id));
-    if (!restaurant) return res.status(404).send('Restaurante não encontrado');
-    res.json(restaurant);
+    const restaurantID = parseInt(req.params.id);
+    db.get('SELECT * FROM restaurants WHERE id = ?', [restaurantID], (err, row) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+
+      if (!row) {
+        return res.status(404).send({message:'Restaurante não encontrado'});
+      }
+      res.json(row);
+    });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao obter restaurante', error: error.message });
   }
 });
 
-app.post('/restaurantes', (req, res) => {
+app.post('/restaurantes', async (req, res) => {
   try {
     const { name, address, startTime, endTime, email, password } = req.body;
 
@@ -39,74 +47,88 @@ app.post('/restaurantes', (req, res) => {
       return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
     }
 
-    const emailExists = restaurants.some(restaurant => restaurant.email === email);
-    if (emailExists) {
-      return res.status(400).json({ message: 'Email já cadastrado. Use outro email.' });
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres.' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: 'A senha deve ter no mínimo 8 caracteres.' });
-  }
+    db.get('SELECT email FROM restaurants WHERE email = ?', [email], (err, row) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (row) {
+        return res.status(400).json({ message: 'Email já cadastrado. Use outro email.' });
+      }
 
-    const newRestaurant = {
-      id: new Date().getTime(),
-      name,
-      address,
-      startTime,
-      endTime,
-      email,
-      password
-    };
-
-    restaurants.push(newRestaurant);
-    res.status(201).json({ message: 'Restaurante criado com sucesso', restaurant: newRestaurant });
+      const sql = 'INSERT INTO restaurants (name, address, startTime, endTime, email, password) VALUES (?, ?, ?, ?, ?, ?)';
+      db.run(sql, [name, address, startTime, endTime, email, password], function (err) {
+        if (err) {
+          throw new Error(err.message);
+        }
+        res.status(201).json({ message: 'Restaurante criado com sucesso', restaurantId: this.lastID });
+      });
+    });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao criar restaurante', error: error.message });
   }
 });
 
 app.post('/restaurantes/signin', (req, res) => {
-  const { email, password } = req.body;
-  const restaurant = restaurants.find(r => r.email === email && r.password === password);
+  try {
+    const { email, password } = req.body;
 
-  if (!restaurant) {
-    return res.status(401).json({ message: 'Email ou senha incorretos' });
+    db.get('SELECT * FROM restaurants WHERE email = ? AND password = ?', [email, password], (err, row) => { // Fixed password typo
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (!row) {
+        return res.status(401).json({ message: 'Email ou senha incorretos' });
+      }
+      res.json({ message: 'Login bem-sucedido', restaurant: row });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao fazer login', error: error.message });
   }
-
-  res.json({ message: 'Login bem-sucedido', restaurant });
 });
-
 
 app.put('/restaurantes/:id', (req, res) => {
   try {
-    const restaurant = restaurants.find(r => r.id === parseInt(req.params.id));
-    if (!restaurant) return res.status(404).send('Restaurante não encontrado');
-
+    const restaurantId = parseInt(req.params.id);
     const { name, address, startTime, endTime, email, password } = req.body;
 
     if (!name || !address || !startTime || !endTime || !email || !password) {
       return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
     }
 
-    restaurant.name = name;
-    restaurant.address = address;
-    restaurant.startTime = startTime;
-    restaurant.endTime = endTime;
-    restaurant.email = email;
-    restaurant.password = password;
-
-    res.json({ message: 'Restaurante atualizado com sucesso', restaurant });
+    const sql = 'UPDATE restaurants SET name = ?, address = ?, startTime = ?, endTime = ?, email = ?, password = ? WHERE id = ?';
+    db.run(sql, [name, address, startTime, endTime, email, password, restaurantId], function (err) {
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Restaurante não encontrado' });
+      }
+      res.json({ message: 'Restaurante atualizado com sucesso' });
+    });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao atualizar restaurante', error: error.message });
   }
 });
 
 app.delete('/restaurantes/:id', (req, res) => {
-  const restaurantIndex = restaurants.findIndex(r => r.id === parseInt(req.params.id));
-  if (restaurantIndex === -1) return res.status(404).send('Restaurante não encontrado');
-
-  const deletedRestaurant = restaurants.splice(restaurantIndex, 1);
-  res.json({ message: 'Restaurante deletado com sucesso', deletedRestaurant });
+  try {
+    const restaurantId = parseInt(req.params.id);
+    db.run('DELETE FROM restaurants WHERE id = ?', [restaurantId], function (err) {
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Restaurante não encontrado' });
+      }
+      res.status(200).json({ message: 'Restaurante deletado com sucesso' });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar restaurante', error: error.message });
+  }
 });
 
 app.listen(port, () => {
