@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.getElementById('home-btn').onclick = function() {
-        window.location.href = '/client/index.html';
+        window.location.href = '/index.html';
     };
 
     editRestaurantBtn.onclick = function() {
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             alert(data.message);
             editRestaurantModal.style.display = "none";
-            window.location.href = `/client/restaurant/restaurant-show.html?id=${restaurantId}`;
+            window.location.href = `/restaurant/restaurant-show.html?id=${restaurantId}`;
         })
         .catch(error => {
             alert(error.message);
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(data => {
                 restaurantDeleted = true;
-                window.location.href = '/client/index.html';
+                window.location.href = '/index.html';
                 alert(data.message);
             })
             .catch(error => {
