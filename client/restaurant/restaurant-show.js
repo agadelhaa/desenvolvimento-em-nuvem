@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const restaurantId = getQueryParam('id');
 
     function fetchRestaurantDetails() {
-        fetch(`http://localhost:5080/restaurantes/${restaurantId}`)
+        fetch(`https://apirestaurantes-dqqepdkz.b4a.run/restaurantes/${restaurantId}`)
         .then(response => {
             if (response.status === 404) {
                 throw new Error('Restaurante não encontrado.');
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             password: restaurantPassword.value
         };
 
-        fetch(`http://localhost:5080/restaurantes/${restaurantId}`, {
+        fetch(`https://apirestaurantes-dqqepdkz.b4a.run/restaurantes/${restaurantId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const confirmation = confirm("Você tem certeza que deseja deletar este restaurante?");
       
         if (confirmation) {
-            fetch(`http://localhost:5080/restaurantes/${restaurantId}`, {
+            fetch(`https://apirestaurantes-dqqepdkz.b4a.run/restaurantes/${restaurantId}`, {
                 method: 'DELETE'
             })
             .then(response => {
