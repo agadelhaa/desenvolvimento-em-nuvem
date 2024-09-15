@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const data = await response.json();
 
-      window.location.href = `/client/restaurant/restaurant-show.html?id=${data.restaurantId}`;
+      window.location.href = `/restaurant/restaurant-show.html?id=${data.restaurantId}`;
     } catch (error) {
       alert(error.message);
       console.error('Erro ao criar o restaurante:', error);
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await response.json();
       alert("Login bem-sucedido!");
 
-      window.location.href = `/client/restaurant/restaurant-show.html?id=${data.restaurant.id}`;
+      window.location.href = `/restaurant/restaurant-show.html?id=${data.restaurant.id}`;
     } catch (error) {
       alert("Erro ao fazer login: " + error.message);
       console.error("Erro ao fazer login:", error);
