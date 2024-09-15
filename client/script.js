@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      const response = await fetch('http://localhost:5080/restaurantes', {
+      const response = await fetch('https://apirestaurantes-dqqepdkz.b4a.run/restaurantes', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   
     try {
-      const response = await fetch("http://localhost:5080/restaurantes/signin", {
+      const response = await fetch("https://apirestaurantes-dqqepdkz.b4a.run/restaurantes/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
