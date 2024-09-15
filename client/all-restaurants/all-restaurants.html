@@ -31,7 +31,7 @@
                 window.location.href = '/client/index.html';
             };
 
-            fetch('http://localhost:5080/restaurantes')
+            fetch('https://apirestaurantes-dqqepdkz.b4a.run/restaurantes')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Failed to fetch restaurant data');
