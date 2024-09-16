@@ -1,0 +1,11 @@
+{
+  "name": "parse-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "parse-server --appId $PARSE_SERVER_APPLICATION_ID --masterKey $PARSE_SERVER_MASTER_KEY --databaseUri $PARSE_SERVER_DATABASE_URI"
+  },
+  "dependencies": {
+    "parse-server": "^5.0.0"
+  }
+}
