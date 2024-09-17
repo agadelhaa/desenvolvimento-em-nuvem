@@ -1,5 +1,3 @@
-// public/script.js
-
 // Cadastro
 document.querySelector('#registerForm').addEventListener('submit', async function(event) {
     event.preventDefault();
