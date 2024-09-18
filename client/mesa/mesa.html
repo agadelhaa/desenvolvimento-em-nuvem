@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Gerenciar Mesas</title>
+</head>
+<body>
+    <header id="all-restaurants-header">
+        <h1>Gerenciar Mesas</h1>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Adicionar Mesa</h2>
+                <form id="table-form">
+                    <div class="mb-3">
+                        <label for="restaurant-id" class="form-label">ID do Restaurante</label>
+                        <input type="number" id="restaurant-id" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="table-number" class="form-label">Número da Mesa</label>
+                        <input type="number" id="table-number" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacity" class="form-label">Capacidade da Mesa</label>
+                        <input type="number" id="capacity" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Adicionar Mesa</button>
+                </form>
+
+                <hr>
+
+                <h2>Mesas Existentes</h2>
+                <ul id="table-list" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById('table-form');
+            const tableList = document.getElementById('table-list');
+
+            function loadTables() {
+                fetch('http://localhost:3000/mesas')
+                    .then(response => response.json())
+                    .then(tables => {
+                        tableList.innerHTML = '';
+                        tables.forEach(table => {
+                            const li = document.createElement('li');
+                            li.classList.add('list-group-item');
+                            li.innerHTML = `
+                                <strong>Mesa ${table.table_number}</strong> (Restaurante ID: ${table.restaurant_id}, Capacidade: ${table.capacity})
+                                <button class="btn btn-danger btn-sm float-end delete-table" data-id="${table.id}">Deletar</button>
+                                <button class="btn btn-warning btn-sm float-end me-2 edit-table" data-id="${table.id}">Editar</button>
+                            `;
+                            tableList.appendChild(li);
+                        });
+
+                        document.querySelectorAll('.delete-table').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const tableId = this.getAttribute('data-id');
+                                deleteTable(tableId);
+                            });
+                        });
+
+                        document.querySelectorAll('.edit-table').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const tableId = this.getAttribute('data-id');
+                                editTable(tableId);
+                            });
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar mesas:', error));
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const table = {
+                    restaurant_id: document.getElementById('restaurant-id').value,
+                    table_number: document.getElementById('table-number').value,
+                    capacity: document.getElementById('capacity').value
+                };
+
+                fetch('http://localhost:3000/mesas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(table)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao adicionar mesa');
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    alert('Mesa adicionada com sucesso!');
+                    form.reset();
+                    loadTables();
+                })
+                .catch(error => {
+                    console.error('Erro ao adicionar mesa:', error);
+                    alert('Erro ao adicionar mesa. Tente novamente.');
+                });
+            });
+
+            function deleteTable(id) {
+                fetch(`http://localhost:3000/mesas/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(() => {
+                    alert('Mesa deletada com sucesso!');
+                    loadTables();
+                })
+                .catch(error => {
+                    console.error('Erro ao deletar mesa:', error);
+                    alert('Erro ao deletar mesa. Tente novamente.');
+                });
+            }
+
+            function editTable(id) {
+                const restaurantId = prompt('Digite o novo ID do restaurante:');
+                const tableNumber = prompt('Digite o novo número da mesa:');
+                const capacity = prompt('Digite a nova capacidade da mesa:');
+                
+                if (restaurantId && tableNumber && capacity) {
+                    fetch(`http://localhost:3000/mesas/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            restaurant_id: restaurantId,
+                            table_number: tableNumber,
+                            capacity: capacity
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao editar mesa');
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        alert('Mesa editada com sucesso!');
+                        loadTables();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao editar mesa:', error);
+                        alert('Erro ao editar mesa. Tente novamente.');
+                    });
+                } else {
+                    alert('Todos os campos são obrigatórios!');
+                }
+            }
+
+            loadTables();
+        });
+    </script>
+</body>
+</html>
