@@ -131,6 +131,130 @@ app.delete('/restaurantes/:id', (req, res) => {
   }
 });
 
+// Adicionar um cardápio a um restaurante
+app.post('/restaurantes/:id/cardapios', async (req, res) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    const { name, description, price } = req.body; 
+
+    if (!name || !price ) { 
+        return res.status(400).json({ message: 'Nome e preço do prato são obrigatórios.' });
+    }
+
+    db.run(
+      'INSERT INTO menus (restaurant_id, name, description, price) VALUES (?, ?, ?, ?)',
+      [restaurantId, name, description, price], 
+      function (err) {
+        if (err) {
+          throw new Error(err.message);
+        }
+        res.status(201).json({ message: 'Cardápio criado com sucesso', menuId: this.lastID });
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao criar cardápio', error: error.message });
+  }
+});
+
+// Listar cardápios de um restaurante
+app.get('/restaurantes/:id/cardapios', async (req, res) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    db.all('SELECT * FROM menus WHERE restaurant_id = ?', [restaurantId], (err, rows) => {
+      if (err) {
+        throw new Error(err.message);
+      }
+      res.json(rows);
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao obter cardápios', error: error.message });
+  }
+});
+
+app.get('/restaurantes/:id/cardapios/:itemId', async (req, res) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    const itemId = parseInt(req.params.itemId);
+
+    const sql = 'SELECT * FROM menus WHERE id = ? AND restaurant_id = ?';
+    db.get(sql, [itemId, restaurantId], (err, row) => {
+      if (err) {
+        return res.status(500).json({ message: 'Erro ao buscar o prato.' });
+      }
+
+      if (!row) {
+        return res.status(404).json({ message: 'Prato não encontrado.' });
+      }
+
+      res.json(row);
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Erro no servidor.', error: error.message });
+  }
+});
+
+// Excluir um cardápio de um restaurante
+app.delete('/restaurantes/:id/cardapios/:itemId', (req, res) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    const itemId = parseInt(req.params.itemId);
+    db.run('DELETE FROM menus WHERE id = ? AND restaurant_id = ?', [itemId, restaurantId], function (err) {
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Prato não encontrado ou não pertence a este restaurante.' });
+      }
+      res.status(200).json({ message: 'Prato deletado com sucesso!' });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar cardapio', error: error.message });
+  }
+});
+
+// Editar um cardápio de um restaurante
+app.put('/restaurantes/:id/cardapios/:itemId', (req, res) => {
+  try {
+    const restaurantId = parseInt(req.params.id);
+    const itemId = parseInt(req.params.itemId);
+    const { name, description, price } = req.body;
+
+    if (!name || !price ) {
+      return res.status(400).json({ message: 'Nome e preço do prato são obrigatórios.' });
+    }
+
+    const sql = `
+      UPDATE menus 
+      SET name = ?, description = ?, price = ?
+      WHERE id = ? AND restaurant_id = ?
+    `;
+
+    db.run(sql, [name, description, price, itemId, restaurantId], function (err) {
+      if (err) {
+        throw new Error(err.message);
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ message: 'Prato não encontrado ou não pertence a este restaurante.' });
+      }
+      res.json({ message: 'Prato atualizado com sucesso!' });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar o prato', error: error.message });
+  }
+});
+
+// Rota debug-prato aqui:
+app.get('/debug-prato', (req, res) => {
+  const sql = 'SELECT * FROM menus WHERE id = ?';
+  db.get(sql, [5], (err, row) => { 
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(row); 
+  });
+});
+
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });

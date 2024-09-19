@@ -23,6 +23,17 @@ db.serialize(() => {
             password TEXT NOT NULL
         );
     `)
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS menus (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            restaurant_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            price REAL NOT NULL,
+            FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+        );
+    `);
 })
 
 function seedMockRestaurants() {

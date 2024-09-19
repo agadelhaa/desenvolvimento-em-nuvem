@@ -14,14 +14,14 @@
     </header>
 
     <section id="restaurant-edit-delete">
-        
-
         <div id="btns-container">
             <div>
                 <button id="home-btn" class="btn btn-outline-light btn-sm">Voltar para a página inicial</button>
             </div>
             <div class="d-flex gap-2">
                 <button id="edit-btn" class="btn btn-outline-light btn-sm">Editar Perfil</button>
+                <button id="add-menu-item-btn" class="btn btn-outline-light btn-sm">Adicionar Prato ao Cardápio</button>
+                <button id="manage-menu-btn" class="btn btn-outline-light btn-sm">Gerenciar Pratos</button> 
                 <button id="delete-btn" class="btn btn-outline-danger btn-sm">Deletar Perfil</button>
             </div>
         </div>
@@ -69,6 +69,39 @@
             <h2>Reservas:</h2>
         </div>
     </section>
+
+    
+
+    <!-- Modal para adicionar prato -->
+    <div id="add-menu-item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Adicionar Prato ao Cardápio</h2>
+            <form id="add-menu-item-form">
+                <input type="text" name="itemName" placeholder="Nome do Prato" required />
+                <textarea name="itemDescription" placeholder="Descrição (opcional)"></textarea>
+                <input type="number" name="itemPrice" placeholder="Preço" step="0.01" required />
+                <button type="submit" class="btn btn-dark">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Gerenciar Pratos -->
+    <div id="manage-menu-modal" class="modal">
+        <div class="modal-content">
+          <button 
+            type="button" 
+            class="close-manage-menu btn-close" 
+            data-bs-dismiss="modal" 
+            aria-label="Close"
+            style="position: absolute; top: 10px; right: 10px; color: red;" 
+          ></button>
+          <h2 class="mb-3">Gerenciar Cardápio</h2>
+          <ul id="modal-menu-list">
+            <!-- Pratos serão listados aqui -->
+          </ul>
+        </div>
+    </div>
 
     <script src="restaurant-show.js"></script>
 </body>
